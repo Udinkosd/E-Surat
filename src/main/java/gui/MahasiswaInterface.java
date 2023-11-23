@@ -7,6 +7,7 @@ import entitas.DataDiri;
 import entitas.Pengajuan;
 import entitas.RiwayatSurat;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -67,7 +68,28 @@ public class MahasiswaInterface extends javax.swing.JFrame {
         Navigation.setVisible(true);
         cardLayout = (CardLayout) pnlCards.getLayout();
         suratButtonPanel = new JPanel();
-        showData();
+        
+        peruntukanField.setForeground(Color.GRAY);
+        peruntukanField.setText("Silahkan mengisi peruntukkan surat");
+        peruntukanField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (peruntukanField.getText().equals("Silahkan mengisi peruntukkan surat")) {
+                    peruntukanField.setText("");
+                    peruntukanField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (peruntukanField.getText().isEmpty()) {
+                    peruntukanField.setText("Silahkan mengisi peruntukkan surat");
+                    peruntukanField.setForeground(Color.GRAY);
+                }
+            }
+        });
+
+        showData(); // Ensure this method is called after setting the FocusListener
     }
     
      public void setPeruntukan(String peruntukan) {
@@ -81,7 +103,7 @@ public class MahasiswaInterface extends javax.swing.JFrame {
     public void setCheckNim(String checkNim) {
         this.checkNim = checkNim;
     }
-
+        
     private void showTable() {
         DefaultTableModel model = new DefaultTableModel();
 
@@ -792,13 +814,13 @@ public class MahasiswaInterface extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_buatSuratActionPerformed
-
+   
     private void peruntukanFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_peruntukanFieldActionPerformed
         // TODO add your handling code here:
         String userPeruntukanInput = peruntukanField.getText();
 
         if (userPeruntukanInput != null && !userPeruntukanInput.isEmpty()) {
-            peruntukanField.setText(userPeruntukanInput);
+            System.out.println("User input for Peruntukan: " + userPeruntukanInput);
         } else {
             System.out.println("Data tidak ditemukan");
         }

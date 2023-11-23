@@ -33,9 +33,8 @@ import javax.swing.JOptionPane;
 public class StaffInterface extends javax.swing.JFrame {
     final Database database;
     private final String roleChecker;
-    RiwayatSurat riwayatSurat = new RiwayatSurat();
-//    PanelAction actionPanel = new PanelAction();
-    CardLayout cardLayout;
+    private CardLayout cardLayout;
+    private RiwayatSurat riwayatSurat;
     private String email;
     private String password;
     private String mahasiswaNIM;
@@ -49,15 +48,21 @@ public class StaffInterface extends javax.swing.JFrame {
         initComponents();
         database = new Database();
         this.roleChecker = roleChecker;
+        initializePanels();
+    }
+    
+    private void initializePanels() {
+        riwayatSurat = new RiwayatSurat();
         pnlCards.add(welcomePanel, "pnlCard5");
         pnlCards.add(suratPanel, "pnlCard2");
-        pnlCards.add(profilPanel, "pnlCard1");
-        pnlCards.add(buatPanel, "pnlCard4");
+        pnlCards.add(profilPane, "pnlCard1");
+        pnlCards.add(hidePanel, "pnlCard4");
         Navigation.setPreferredSize(new Dimension(50, 520)); 
         Navigation.setVisible(true);
         cardLayout = (CardLayout) (pnlCards.getLayout());
         suratTabel.setDefaultEditor(Object.class, null);
         suratTabel.setCellSelectionEnabled(false);
+        showTable();
     }
     
      public void setPeruntukan(String peruntukan) {
@@ -117,20 +122,46 @@ public class StaffInterface extends javax.swing.JFrame {
 
     private void showData(String nimToCheck, String idSurat) {
         DataDiri dataMahasiswa = new DataDiri();
-        String[] data = (String[]) dataMahasiswa.readData(nimToCheck); 
+        Pengajuan dataSurat = new Pengajuan(null, nimToCheck, null);
+        String[] data = dataMahasiswa.readData(nimToCheck);
+        String peruntukanData = dataSurat.readData(nimToCheck);
+        
+        if (peruntukanData != null) {
+            intededPanel.setText(peruntukanData);
+        } else {
+            System.out.println("Data tidak ditemukan");
+        }
 
-        if (data != null) {
-            System.out.println("NIM: " + Arrays.toString(data));
-            namaLengkap.setText((String) data[0]);
-            nimNomor.setText((String) data[1]);
-            programStudi.setText((String) data[2]);
-            jenjangStudi.setText((String) data[3]);
-            ipkMahasiswa.setText((String) data[4]);
-            kontakNomor.setText((String) data[5]);
-            angkatanTahun.setText((String) data[6]);
-            semesterTahun.setText((String) data[7]);
-            alamatRumah.setText((String) data[8]);
-            tempatTanggalLahir.setText((String) data[9]);
+        String fullName = (String) data[1];
+        String[] names = fullName.split("\\s", 2);
+        if (data != null && data.length > 1) {
+            
+            if (names.length > 0) {
+                firstName.setText(names[0]);
+            }
+            if (names.length > 1) {
+                lastName.setText(" " + names[1]);
+            }
+            studyProgram.setText(data[2]);
+            studyLevel.setText(data[3]);
+            gpaPoint.setText(data[4]);
+            phoneNumber.setText(data[5]);
+            enrollYear.setText(data[6]);
+            semesterYear.setText(data[7]);
+            addressPlace.setText(data[8]);
+            placeBirth.setText(data[10]);
+            
+            String[] dateComponents = data[11].split("-");
+            if (dateComponents.length == 3) {
+                String year = dateComponents[0];
+                String month = dateComponents[1];
+                String day = dateComponents[2];
+                dayCombo.setText(day);
+                monthCombo.setText(month);
+                yearCombo.setText(year);
+            }
+            
+            emailUser.setText(data[12]);
         } else {
             System.out.println("Data tidak ditemukan");
         }
@@ -166,46 +197,42 @@ public class StaffInterface extends javax.swing.JFrame {
         suratPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         suratTabel = new javax.swing.JTable();
-        profilPanel = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabeel = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLebeel = new javax.swing.JLabel();
-        jLabel36 = new javax.swing.JLabel();
-        jLabel37 = new javax.swing.JLabel();
-        jLabel38 = new javax.swing.JLabel();
-        jLabel39 = new javax.swing.JLabel();
-        jLabel40 = new javax.swing.JLabel();
-        jLabel41 = new javax.swing.JLabel();
-        jLabel42 = new javax.swing.JLabel();
-        jLabel43 = new javax.swing.JLabel();
-        jLabel44 = new javax.swing.JLabel();
-        jLabel45 = new javax.swing.JLabel();
-        jLabel46 = new javax.swing.JLabel();
-        jLabel47 = new javax.swing.JLabel();
-        jLabel48 = new javax.swing.JLabel();
-        jLabel49 = new javax.swing.JLabel();
-        jLabel50 = new javax.swing.JLabel();
-        jLabel51 = new javax.swing.JLabel();
-        jLabel52 = new javax.swing.JLabel();
-        namaLengkap = new javax.swing.JLabel();
-        nimNomor = new javax.swing.JLabel();
-        programStudi = new javax.swing.JLabel();
-        jenjangStudi = new javax.swing.JLabel();
-        ipkMahasiswa = new javax.swing.JLabel();
-        kontakNomor = new javax.swing.JLabel();
-        angkatanTahun = new javax.swing.JLabel();
-        semesterTahun = new javax.swing.JLabel();
-        alamatRumah = new javax.swing.JLabel();
-        tempatTanggalLahir = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        acceptButton = new javax.swing.JButton();
-        deniedButton = new javax.swing.JButton();
-        buatPanel = new javax.swing.JPanel();
-        pilihSurat = new javax.swing.JComboBox<>();
-        buatSurat = new javax.swing.JButton();
-        peruntukanField = new javax.swing.JTextField();
+        hidePanel = new javax.swing.JPanel();
+        successfullyPop = new javax.swing.JOptionPane();
+        optionPanel = new javax.swing.JOptionPane();
+        profilPane = new javax.swing.JPanel();
+        jLabel22 = new javax.swing.JLabel();
+        backButton = new javax.swing.JButton();
+        firstName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        lastName = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        studyProgram = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        gpaPoint = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        phoneNumber = new javax.swing.JTextField();
+        emailUser = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        enrollYear = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        semesterYear = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        placeBirth = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        addressPlace = new javax.swing.JTextField();
+        studyLevel = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        deniedButton1 = new javax.swing.JButton();
+        acceptButton1 = new javax.swing.JButton();
+        dayCombo = new javax.swing.JTextField();
+        yearCombo = new javax.swing.JTextField();
+        monthCombo = new javax.swing.JTextField();
+        intededPanel = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -355,472 +382,305 @@ public class StaffInterface extends javax.swing.JFrame {
             }
         });
         suratTabel.setRowHeight(30);
+        suratTabel.getTableHeader().setReorderingAllowed(false);
         suratTabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 suratTabelMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(suratTabel);
+        if (suratTabel.getColumnModel().getColumnCount() > 0) {
+            suratTabel.getColumnModel().getColumn(0).setHeaderValue("No");
+            suratTabel.getColumnModel().getColumn(1).setResizable(false);
+            suratTabel.getColumnModel().getColumn(1).setHeaderValue("Jenis Surat");
+            suratTabel.getColumnModel().getColumn(2).setHeaderValue("Status");
+            suratTabel.getColumnModel().getColumn(3).setHeaderValue("Posisi");
+            suratTabel.getColumnModel().getColumn(4).setHeaderValue("Aksi");
+        }
 
         suratPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(56, 30, 680, -1));
 
         pnlCards.add(suratPanel, "card2");
 
-        profilPanel.setBackground(new java.awt.Color(255, 255, 255));
+        hidePanel.setBackground(new java.awt.Color(255, 255, 255));
+        hidePanel.setMaximumSize(new java.awt.Dimension(960, 578));
+        hidePanel.setMinimumSize(new java.awt.Dimension(960, 578));
+        hidePanel.setName(""); // NOI18N
+        hidePanel.setPreferredSize(new java.awt.Dimension(960, 578));
+        hidePanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        hidePanel.add(successfullyPop, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 250, -1, -1));
+        hidePanel.add(optionPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 250, -1, -1));
 
-        jPanel4.setBackground(new java.awt.Color(0, 166, 90));
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlCards.add(hidePanel, "card2");
 
-        jLabel4.setBackground(new java.awt.Color(0, 166, 90));
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 9)); // NOI18N
-        jLabel4.setText("Berikut adalah data mahasiswa yang melakukan pengajuan surat, mohon periksa dengan seksama");
-        jPanel4.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 800, 30));
+        profilPane.setBackground(new java.awt.Color(255, 255, 255));
+        profilPane.setMaximumSize(new java.awt.Dimension(892, 492));
 
-        jLabeel.setBackground(new java.awt.Color(51, 51, 51));
-        jLabeel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabeel.setForeground(new java.awt.Color(51, 51, 51));
-        jLabeel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabeel.setText("Nama Lengkap");
+        jLabel22.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel22.setText("Account Personal Information");
 
-        jLabel24.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel24.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel24.setText("Nim");
-
-        jLebeel.setBackground(new java.awt.Color(51, 51, 51));
-        jLebeel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLebeel.setForeground(new java.awt.Color(51, 51, 51));
-        jLebeel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLebeel.setText("Program Studi");
-
-        jLabel36.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel36.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel36.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel36.setText("Jenjang Studi");
-
-        jLabel37.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel37.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel37.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel37.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel37.setText("IPK");
-
-        jLabel38.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel38.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel38.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel38.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel38.setText("Kontak");
-
-        jLabel39.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel39.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel39.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel39.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel39.setText("Angkatan");
-
-        jLabel40.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel40.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel40.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel40.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel40.setText("Semester");
-
-        jLabel41.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel41.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel41.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel41.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel41.setText("Alamat");
-
-        jLabel42.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel42.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel42.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel42.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel42.setText("Tempat Tanggal Lahir");
-
-        jLabel43.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel43.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel43.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel43.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel43.setText(":");
-
-        jLabel44.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel44.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel44.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel44.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel44.setText(":");
-
-        jLabel45.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel45.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel45.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel45.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel45.setText(":");
-
-        jLabel46.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel46.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel46.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel46.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel46.setText(":");
-
-        jLabel47.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel47.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel47.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel47.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel47.setText(":");
-
-        jLabel48.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel48.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel48.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel48.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel48.setText(":");
-
-        jLabel49.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel49.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel49.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel49.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel49.setText(":");
-
-        jLabel50.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel50.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel50.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel50.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel50.setText(":");
-
-        jLabel51.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel51.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel51.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel51.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel51.setText(":");
-
-        jLabel52.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel52.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel52.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel52.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel52.setText(":");
-
-        namaLengkap.setBackground(new java.awt.Color(51, 51, 51));
-        namaLengkap.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        namaLengkap.setForeground(new java.awt.Color(51, 51, 51));
-        namaLengkap.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        namaLengkap.setText("Nama Lengkap");
-        namaLengkap.setToolTipText("");
-        namaLengkap.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        nimNomor.setBackground(new java.awt.Color(51, 51, 51));
-        nimNomor.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        nimNomor.setForeground(new java.awt.Color(51, 51, 51));
-        nimNomor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        nimNomor.setText("Nim");
-        nimNomor.setToolTipText("");
-        nimNomor.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        programStudi.setBackground(new java.awt.Color(51, 51, 51));
-        programStudi.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        programStudi.setForeground(new java.awt.Color(51, 51, 51));
-        programStudi.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        programStudi.setText("Program Studi");
-        programStudi.setToolTipText("");
-        programStudi.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jenjangStudi.setBackground(new java.awt.Color(51, 51, 51));
-        jenjangStudi.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jenjangStudi.setForeground(new java.awt.Color(51, 51, 51));
-        jenjangStudi.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jenjangStudi.setText("Jenjang Studi");
-        jenjangStudi.setToolTipText("");
-        jenjangStudi.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        ipkMahasiswa.setBackground(new java.awt.Color(51, 51, 51));
-        ipkMahasiswa.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        ipkMahasiswa.setForeground(new java.awt.Color(51, 51, 51));
-        ipkMahasiswa.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        ipkMahasiswa.setText("IPK");
-        ipkMahasiswa.setToolTipText("");
-        ipkMahasiswa.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        kontakNomor.setBackground(new java.awt.Color(51, 51, 51));
-        kontakNomor.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        kontakNomor.setForeground(new java.awt.Color(51, 51, 51));
-        kontakNomor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        kontakNomor.setText("Kontak");
-        kontakNomor.setToolTipText("");
-        kontakNomor.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        angkatanTahun.setBackground(new java.awt.Color(51, 51, 51));
-        angkatanTahun.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        angkatanTahun.setForeground(new java.awt.Color(51, 51, 51));
-        angkatanTahun.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        angkatanTahun.setText("Angkatan");
-        angkatanTahun.setToolTipText("");
-        angkatanTahun.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        semesterTahun.setBackground(new java.awt.Color(51, 51, 51));
-        semesterTahun.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        semesterTahun.setForeground(new java.awt.Color(51, 51, 51));
-        semesterTahun.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        semesterTahun.setText("Semester");
-        semesterTahun.setToolTipText("");
-        semesterTahun.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        alamatRumah.setBackground(new java.awt.Color(51, 51, 51));
-        alamatRumah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        alamatRumah.setForeground(new java.awt.Color(51, 51, 51));
-        alamatRumah.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        alamatRumah.setText("Alamat");
-        alamatRumah.setToolTipText("");
-        alamatRumah.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        alamatRumah.setMaximumSize(new java.awt.Dimension(100, 100));
-
-        tempatTanggalLahir.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        tempatTanggalLahir.setForeground(new java.awt.Color(51, 51, 51));
-        tempatTanggalLahir.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        tempatTanggalLahir.setText("Tempat Tanggal Lahir");
-        tempatTanggalLahir.setToolTipText("");
-
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setText("Data Diri Mahasiswa");
-
-        acceptButton.setBackground(new java.awt.Color(255, 153, 51));
-        acceptButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        acceptButton.setForeground(new java.awt.Color(255, 255, 255));
-        acceptButton.setText("Accept");
-        acceptButton.addActionListener(new java.awt.event.ActionListener() {
+        backButton.setBackground(new java.awt.Color(255, 153, 51));
+        backButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        backButton.setForeground(new java.awt.Color(255, 255, 255));
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                acceptButtonActionPerformed(evt);
+                backButtonActionPerformed(evt);
             }
         });
 
-        deniedButton.setBackground(new java.awt.Color(204, 0, 0));
-        deniedButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        deniedButton.setForeground(new java.awt.Color(255, 255, 255));
-        deniedButton.setText("Denied");
-        deniedButton.addActionListener(new java.awt.event.ActionListener() {
+        firstName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        firstName.setFocusable(false);
+
+        jLabel3.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel3.setText("First Name");
+
+        jLabel23.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel23.setText("Last Name");
+
+        lastName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        lastName.setFocusable(false);
+
+        jLabel6.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel6.setText("Study Program");
+
+        studyProgram.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        studyProgram.setFocusable(false);
+
+        jLabel7.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel7.setText("GPA");
+
+        gpaPoint.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        gpaPoint.setFocusable(false);
+
+        jLabel8.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel8.setText("Phone Number");
+
+        phoneNumber.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        phoneNumber.setFocusable(false);
+
+        emailUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        emailUser.setFocusable(false);
+
+        jLabel9.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel9.setText("Email");
+
+        jLabel10.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel10.setText("Enrollment Year");
+
+        enrollYear.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        enrollYear.setFocusable(false);
+
+        jLabel11.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel11.setText("Semester");
+
+        semesterYear.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        semesterYear.setFocusable(false);
+
+        jLabel12.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel12.setText("Adress");
+
+        placeBirth.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        placeBirth.setFocusable(false);
+
+        jLabel13.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel13.setText("Place of Birth");
+
+        jLabel14.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel14.setText("Date of Birth");
+
+        addressPlace.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        addressPlace.setFocusable(false);
+
+        studyLevel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        studyLevel.setFocusable(false);
+
+        jLabel18.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel18.setText("Study Level and Degree");
+
+        deniedButton1.setBackground(new java.awt.Color(204, 0, 0));
+        deniedButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        deniedButton1.setForeground(new java.awt.Color(255, 255, 255));
+        deniedButton1.setText("Denied");
+        deniedButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deniedButtonActionPerformed(evt);
+                deniedButton1ActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout profilPanelLayout = new javax.swing.GroupLayout(profilPanel);
-        profilPanel.setLayout(profilPanelLayout);
-        profilPanelLayout.setHorizontalGroup(
-            profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(profilPanelLayout.createSequentialGroup()
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 831, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(165, 165, 165)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(profilPanelLayout.createSequentialGroup()
-                                .addComponent(deniedButton)
-                                .addGap(30, 30, 30)
-                                .addComponent(acceptButton))
-                            .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addComponent(jLabel38)
-                                    .addGap(97, 97, 97)
-                                    .addComponent(jLabel48)
-                                    .addGap(27, 27, 27)
-                                    .addComponent(kontakNomor))
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addComponent(jLabel39)
-                                    .addGap(84, 84, 84)
-                                    .addComponent(jLabel49)
-                                    .addGap(27, 27, 27)
-                                    .addComponent(angkatanTahun))
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addComponent(jLabel40)
-                                    .addGap(83, 83, 83)
-                                    .addComponent(jLabel50)
-                                    .addGap(27, 27, 27)
-                                    .addComponent(semesterTahun))
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addComponent(jLabel41)
-                                    .addGap(98, 98, 98)
-                                    .addComponent(jLabel51)
-                                    .addGap(27, 27, 27)
-                                    .addComponent(alamatRumah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addGap(3, 3, 3)
-                                    .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(profilPanelLayout.createSequentialGroup()
-                                            .addComponent(jLebeel)
-                                            .addGap(54, 54, 54)
-                                            .addComponent(jLabel45)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(programStudi))
-                                        .addGroup(profilPanelLayout.createSequentialGroup()
-                                            .addComponent(jLabel36)
-                                            .addGap(60, 60, 60)
-                                            .addComponent(jLabel46)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(jenjangStudi))
-                                        .addGroup(profilPanelLayout.createSequentialGroup()
-                                            .addComponent(jLabel37)
-                                            .addGap(115, 115, 115)
-                                            .addComponent(jLabel47)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(ipkMahasiswa))
-                                        .addGroup(profilPanelLayout.createSequentialGroup()
-                                            .addComponent(jLabeel)
-                                            .addGap(52, 52, 52)
-                                            .addComponent(jLabel43)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(namaLengkap))
-                                        .addGroup(profilPanelLayout.createSequentialGroup()
-                                            .addComponent(jLabel24)
-                                            .addGap(111, 111, 111)
-                                            .addComponent(jLabel44)
-                                            .addGap(27, 27, 27)
-                                            .addComponent(nimNomor))))
-                                .addGroup(profilPanelLayout.createSequentialGroup()
-                                    .addComponent(jLabel42)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jLabel52)
-                                    .addGap(27, 27, 27)
-                                    .addComponent(tempatTanggalLahir))))))
-                .addContainerGap(55, Short.MAX_VALUE))
+        acceptButton1.setBackground(new java.awt.Color(255, 153, 51));
+        acceptButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        acceptButton1.setForeground(new java.awt.Color(255, 255, 255));
+        acceptButton1.setText("Accept");
+        acceptButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                acceptButton1ActionPerformed(evt);
+            }
+        });
+
+        dayCombo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        dayCombo.setFocusable(false);
+
+        yearCombo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        yearCombo.setFocusable(false);
+
+        monthCombo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        monthCombo.setFocusable(false);
+
+        intededPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        intededPanel.setFocusable(false);
+        intededPanel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                intededPanelActionPerformed(evt);
+            }
+        });
+
+        jLabel15.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel15.setText("Intended purpose of requesting a letter");
+
+        javax.swing.GroupLayout profilPaneLayout = new javax.swing.GroupLayout(profilPane);
+        profilPane.setLayout(profilPaneLayout);
+        profilPaneLayout.setHorizontalGroup(
+            profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(profilPaneLayout.createSequentialGroup()
+                .addGap(132, 132, 132)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addComponent(acceptButton1)
+                        .addGap(18, 18, 18)
+                        .addComponent(deniedButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(backButton))
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3)
+                            .addComponent(firstName, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6)
+                            .addComponent(studyProgram, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel22)
+                            .addComponent(jLabel14)
+                            .addComponent(addressPlace, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(studyLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel18)
+                            .addComponent(jLabel11)
+                            .addComponent(semesterYear, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel12)
+                            .addGroup(profilPaneLayout.createSequentialGroup()
+                                .addComponent(dayCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(26, 26, 26)
+                                .addComponent(monthCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(24, 24, 24)
+                                .addComponent(yearCombo))
+                            .addComponent(jLabel15))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                        .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lastName, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7)
+                            .addComponent(gpaPoint, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(emailUser, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9)
+                            .addComponent(placeBirth, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel23)
+                            .addComponent(jLabel10)
+                            .addComponent(enrollYear, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8)
+                            .addComponent(phoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(intededPanel, javax.swing.GroupLayout.Alignment.LEADING))
+                .addGap(205, 205, 205))
         );
-        profilPanelLayout.setVerticalGroup(
-            profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, profilPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel5)
+        profilPaneLayout.setVerticalGroup(
+            profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(profilPaneLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jLabel22)
+                .addGap(26, 26, 26)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel43)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabeel)
-                            .addComponent(namaLengkap))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel44)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel24)
-                            .addComponent(nimNomor))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel45)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLebeel)
-                            .addComponent(programStudi))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel46)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel36)
-                            .addComponent(jenjangStudi))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel47)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel37)
-                            .addComponent(ipkMahasiswa))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel48)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel38)
-                            .addComponent(kontakNomor))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel49)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel39)
-                            .addComponent(angkatanTahun))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel50)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel40)
-                            .addComponent(semesterTahun))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel51)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel41)
-                            .addComponent(alamatRumah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(12, 12, 12)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel52)
-                    .addGroup(profilPanelLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel42)
-                            .addComponent(tempatTanggalLahir))))
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(firstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(profilPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(acceptButton)
-                    .addComponent(deniedButton))
-                .addGap(40, 40, 40))
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(profilPaneLayout.createSequentialGroup()
+                                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(profilPaneLayout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(studyProgram, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(profilPaneLayout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(gpaPoint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(12, 12, 12)
+                                .addComponent(jLabel18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(studyLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(profilPaneLayout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(enrollYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(semesterYear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(emailUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addComponent(jLabel13)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(placeBirth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(profilPaneLayout.createSequentialGroup()
+                        .addComponent(jLabel14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(dayCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(monthCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(yearCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel12))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addressPlace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(phoneNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addComponent(jLabel15)
+                .addGap(8, 8, 8)
+                .addComponent(intededPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(backButton)
+                    .addGroup(profilPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(acceptButton1)
+                        .addComponent(deniedButton1)))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
-        pnlCards.add(profilPanel, "card5");
-
-        buatPanel.setBackground(new java.awt.Color(255, 255, 255));
-        buatPanel.setMaximumSize(new java.awt.Dimension(960, 578));
-        buatPanel.setMinimumSize(new java.awt.Dimension(960, 578));
-        buatPanel.setName(""); // NOI18N
-        buatPanel.setPreferredSize(new java.awt.Dimension(960, 578));
-        buatPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        pilihSurat.setBackground(new java.awt.Color(255, 255, 255));
-        pilihSurat.setForeground(new java.awt.Color(0, 0, 0));
-        pilihSurat.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Surat Aktif Kuliah", "Surat Keterangan Berkelakuan baik", "Surat Keterangan Kehilangan KTM", "Surat Keterangan Tugas Akhir", "Surat Rekomendasi Beasiswa", "Surat Keterangan Cuti", "Surat keterangan Pengunduran Diri", "Transkrip Nilai Sementara" }));
-        pilihSurat.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        pilihSurat.setMaximumSize(new java.awt.Dimension(100, 100));
-        pilihSurat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pilihSuratActionPerformed(evt);
-            }
-        });
-        buatPanel.add(pilihSurat, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, 470, -1));
-
-        buatSurat.setBackground(new java.awt.Color(255, 153, 51));
-        buatSurat.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        buatSurat.setForeground(new java.awt.Color(255, 255, 255));
-        buatSurat.setText("Buat Surat");
-        buatSurat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buatSuratActionPerformed(evt);
-            }
-        });
-        buatPanel.add(buatSurat, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 170, -1, -1));
-
-        peruntukanField.setBackground(new java.awt.Color(255, 255, 255));
-        peruntukanField.setForeground(new java.awt.Color(0, 0, 0));
-        peruntukanField.setText("Silahkan mengisi peruntukkan surat");
-        peruntukanField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        peruntukanField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                peruntukanFieldActionPerformed(evt);
-            }
-        });
-        buatPanel.add(peruntukanField, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 470, 70));
-
-        pnlCards.add(buatPanel, "card2");
+        pnlCards.add(profilPane, "card5");
 
         javax.swing.GroupLayout backgroundLayout = new javax.swing.GroupLayout(background);
         background.setLayout(backgroundLayout);
@@ -866,6 +726,7 @@ public class StaffInterface extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void suratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suratActionPerformed
@@ -873,31 +734,6 @@ public class StaffInterface extends javax.swing.JFrame {
         cardLayout.show(pnlCards, "pnlCard5");
         showTable();
     }//GEN-LAST:event_suratActionPerformed
-
-    private void acceptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButtonActionPerformed
-        // TODO add your handling code here:
-        DataUpdate dataUpdate = new DataUpdate(idSuratToAccept, "Accept");
-        RiwayatSurat riwayatSurat = new RiwayatSurat();
-        boolean updateSuccessful = riwayatSurat.updateData(dataUpdate);
-
-        if (updateSuccessful) {
-            System.out.println("Status updated to 'accept'");
-        } else {
-            System.out.println("Status update failed");
-        }
-    }//GEN-LAST:event_acceptButtonActionPerformed
-
-    private void pilihSuratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pilihSuratActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pilihSuratActionPerformed
-
-    private void buatSuratActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buatSuratActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_buatSuratActionPerformed
-
-    private void peruntukanFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_peruntukanFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_peruntukanFieldActionPerformed
 
     private void navButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_navButtonActionPerformed
         // TODO add your handling code here:
@@ -916,6 +752,7 @@ public class StaffInterface extends javax.swing.JFrame {
     private void dashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardActionPerformed
         // TODO add your handling code here:
         cardLayout.show(pnlCards, "pnlCard2");
+        showTable();
     }//GEN-LAST:event_dashboardActionPerformed
 
     private void suratTabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_suratTabelMouseClicked
@@ -927,18 +764,68 @@ public class StaffInterface extends javax.swing.JFrame {
         navigateToLoginScreen();
     }//GEN-LAST:event_signOutActionPerformed
 
-    private void deniedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deniedButtonActionPerformed
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         // TODO add your handling code here:
-        DataUpdate dataUpdate = new DataUpdate(idSuratToAccept, "Denied");
-        RiwayatSurat riwayatSurat = new RiwayatSurat();
-        boolean updateSuccessful = riwayatSurat.updateData(dataUpdate);
+        cardLayout.show(pnlCards, "pnlCard2");
+        showTable();
 
-        if (updateSuccessful) {
-            System.out.println("Status updated to 'denied'");
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void deniedButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deniedButton1ActionPerformed
+        // TODO add your handling code here:
+        int choice = JOptionPane.showOptionDialog(this, 
+        "Are you sure you want to deny the surat?", 
+        "Deny Confirmation", 
+        JOptionPane.YES_NO_OPTION, 
+        JOptionPane.QUESTION_MESSAGE, 
+        null, 
+        null, 
+        null);
+
+        if (choice == JOptionPane.YES_OPTION) {
+            DataUpdate dataUpdate = new DataUpdate(idSuratToAccept, "Denied");
+            RiwayatSurat riwayatSurat = new RiwayatSurat();
+            boolean updateSuccessful = riwayatSurat.updateData(dataUpdate);
+
+            if (updateSuccessful) {
+                System.out.println("Status updated to 'denied'");
+                JOptionPane.showMessageDialog(this, "Surat has been denied!");
+            } else {
+                System.out.println("Status update failed");
+            }
         } else {
-            System.out.println("Status update failed");
         }
-    }//GEN-LAST:event_deniedButtonActionPerformed
+    }//GEN-LAST:event_deniedButton1ActionPerformed
+
+    private void acceptButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButton1ActionPerformed
+        // TODO add your handling code here:
+        int choice = JOptionPane.showOptionDialog(this, 
+        "Are you sure you want to accept the surat?", 
+        "Accept Confirmation", 
+        JOptionPane.YES_NO_OPTION, 
+        JOptionPane.QUESTION_MESSAGE, 
+        null, 
+        null, 
+        null);
+
+        if (choice == JOptionPane.YES_OPTION) {
+            DataUpdate dataUpdate = new DataUpdate(idSuratToAccept, "Accept");
+            RiwayatSurat riwayatSurat = new RiwayatSurat();
+            boolean updateSuccessful = riwayatSurat.updateData(dataUpdate);
+
+            if (updateSuccessful) {
+                System.out.println("Status updated to 'accept'");
+                JOptionPane.showMessageDialog(optionPanel, "Surat has been accepted successfully!");
+            } else {
+                System.out.println("Status update failed");
+            }
+        } else {
+        }
+    }//GEN-LAST:event_acceptButton1ActionPerformed
+
+    private void intededPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_intededPanelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_intededPanelActionPerformed
 
     /**
      * @param args the command line arguments
@@ -966,6 +853,7 @@ public class StaffInterface extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(StaffInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
@@ -976,59 +864,67 @@ public class StaffInterface extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Navigation;
-    private javax.swing.JButton acceptButton;
-    private javax.swing.JLabel alamatRumah;
-    private javax.swing.JLabel angkatanTahun;
+    private javax.swing.JButton acceptButton1;
+    private javax.swing.JTextField addressPlace;
+    private javax.swing.JButton backButton;
     private javax.swing.JPanel background;
-    private javax.swing.JPanel buatPanel;
-    private javax.swing.JButton buatSurat;
     private javax.swing.JButton dashboard;
-    private javax.swing.JButton deniedButton;
-    private javax.swing.JLabel ipkMahasiswa;
-    private javax.swing.JLabel jLabeel;
+    private javax.swing.JTextField dayCombo;
+    private javax.swing.JButton deniedButton1;
+    private javax.swing.JTextField emailUser;
+    private javax.swing.JTextField enrollYear;
+    private javax.swing.JTextField firstName;
+    private javax.swing.JTextField gpaPoint;
+    private javax.swing.JPanel hidePanel;
+    private javax.swing.JTextField intededPanel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel38;
-    private javax.swing.JLabel jLabel39;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel40;
-    private javax.swing.JLabel jLabel41;
-    private javax.swing.JLabel jLabel42;
-    private javax.swing.JLabel jLabel43;
-    private javax.swing.JLabel jLabel44;
-    private javax.swing.JLabel jLabel45;
-    private javax.swing.JLabel jLabel46;
-    private javax.swing.JLabel jLabel47;
-    private javax.swing.JLabel jLabel48;
-    private javax.swing.JLabel jLabel49;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel50;
-    private javax.swing.JLabel jLabel51;
-    private javax.swing.JLabel jLabel52;
-    private javax.swing.JLabel jLebeel;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel jenjangStudi;
-    private javax.swing.JLabel kontakNomor;
+    private javax.swing.JTextField lastName;
     private javax.swing.JLabel mahasiswaText;
-    private javax.swing.JLabel namaLengkap;
+    private javax.swing.JTextField monthCombo;
     private javax.swing.JButton navButton;
-    private javax.swing.JLabel nimNomor;
+    private javax.swing.JOptionPane optionPanel;
     private javax.swing.JPanel orangePanel;
-    private javax.swing.JTextField peruntukanField;
-    private javax.swing.JComboBox<String> pilihSurat;
+    private javax.swing.JTextField phoneNumber;
+    private javax.swing.JTextField placeBirth;
     private javax.swing.JPanel pnlCards;
+    private javax.swing.JPanel profilPane;
     private javax.swing.JPanel profilPanel;
-    private javax.swing.JLabel programStudi;
-    private javax.swing.JLabel semesterTahun;
+    private javax.swing.JPanel profilPanel1;
+    private javax.swing.JPanel profilPanel2;
+    private javax.swing.JPanel profilPanel3;
+    private javax.swing.JButton saveData;
+    private javax.swing.JButton saveData1;
+    private javax.swing.JButton saveData2;
+    private javax.swing.JButton saveData3;
+    private javax.swing.JTextField semesterYear;
     private javax.swing.JButton signOut;
+    private javax.swing.JTextField studyLevel;
+    private javax.swing.JTextField studyProgram;
+    private javax.swing.JOptionPane successfullyPop;
     private javax.swing.JButton surat;
     private javax.swing.JPanel suratPanel;
     private javax.swing.JTable suratTabel;
-    private javax.swing.JLabel tempatTanggalLahir;
     private javax.swing.JPanel welcomePanel;
+    private javax.swing.JTextField yearCombo;
     // End of variables declaration//GEN-END:variables
 }

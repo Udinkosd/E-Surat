@@ -1,10 +1,10 @@
 gui\MahasiswaForm$4.class
 gui\StaffForm$4.class
-gui\StaffInterface$13.class
 entitas\Admin.class
 gui\ChooseLogin$1.class
 gui\MahasiswaInterface$8.class
 gui\StaffInterface$7.class
+gui\MahasiswaInterface$15.class
 action\PanelAction$1.class
 gui\StaffInterface$3.class
 action\Test.class

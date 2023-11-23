@@ -47,32 +47,22 @@ public class Pengajuan extends Database {
         return generatedId;
     }
     
-    public String[] readData() {
+    public String readData(String nimToCheck) {
+        String peruntukan = null;
         try {
             openConnection();
 
-            String[] data = new String[6];
-            String sql = "SELECT * FROM pengajuan";
+            String sql = "SELECT Peruntukan FROM pengajuan WHERE Mahasiswa_NIM1 = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, nimToCheck);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                data[0] = resultSet.getString("ID_Pengajuan");
-                data[1] = resultSet.getString("Peruntukan");
-                data[2] = resultSet.getString("Lampiran");
-                data[3] = resultSet.getString("Mahasiswa_NIM");
-                data[4] = resultSet.getString("Aktivitas_ID_Aktivitas");
-                data[5] = resultSet.getString("Tanggal");
-
-                return data;
+                peruntukan = resultSet.getString("Peruntukan");
             }
         } catch (SQLException ex) {
             Logger.getLogger(Pengajuan.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return null;
+        return peruntukan;
     }
 }
-
-
-
